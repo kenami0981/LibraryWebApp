@@ -1,15 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36804.6 d17.14
+VisualStudioVersion = 17.14.36804.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.API", "Library.API\Library.API.csproj", "{328D0040-C0C6-4A47-99F1-7589404F2A28}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7B5DB70C-2999-4A4F-AEDC-AC09DEDDCF2A} = {7B5DB70C-2999-4A4F-AEDC-AC09DEDDCF2A}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.Application", "Library.Application\Library.Application.csproj", "{7B5DB70C-2999-4A4F-AEDC-AC09DEDDCF2A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{58F7233E-3D75-4A93-B8A7-1AD9FDDD973B} = {58F7233E-3D75-4A93-B8A7-1AD9FDDD973B}
+		{CFA38665-6032-4176-9ED5-E3CED3C99F0C} = {CFA38665-6032-4176-9ED5-E3CED3C99F0C}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.Domain", "Library.Domain\Library.Domain.csproj", "{CFA38665-6032-4176-9ED5-E3CED3C99F0C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library.Infrastructure", "Library.Infrastructure\Library.Infrastructure.csproj", "{58F7233E-3D75-4A93-B8A7-1AD9FDDD973B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CFA38665-6032-4176-9ED5-E3CED3C99F0C} = {CFA38665-6032-4176-9ED5-E3CED3C99F0C}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
