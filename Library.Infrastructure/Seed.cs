@@ -1,12 +1,28 @@
 ﻿using Library.Domain;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Library.Infrastructure
 {
     public class Seed
     {
-        public static async Task SeedData(DataContext context)
+        public static async Task SeedData(DataContext context, UserManager<AppUser> userManager)
         {
+            if(!userManager.Users.Any())
+            {
+                var users = new List<AppUser>
+                {
+                    new AppUser{DisplayName="franek", UserName="Franco123", Email="franek@test.com",Bio=""},
+                    new AppUser{DisplayName ="asia", UserName="asia123", Email="asia@test.com",Bio=""}
+                };
+
+                foreach(var user in users)
+                {
+                    await userManager.CreateAsync(user, "Hase!l0123");
+                }
+
+            }
+
             // Sprawdzamy asynchronicznie, czy są już jacyś autorzy
             if (await context.Authors.AnyAsync()) return;
 

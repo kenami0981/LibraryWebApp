@@ -3,10 +3,22 @@ using Library.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation.AspNetCore;
 using FluentValidation;
+using Library.API;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Library.Domain;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddControllers(opt =>
+{
+   var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+    opt.Filters.Add(new Microsoft.AspNetCore.Mvc.Authorization.AuthorizeFilter(policy));
+});
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -38,6 +50,9 @@ builder.Services.AddFluentValidationAutoValidation();
 // Rejestracja walidatorów z assembly zawieraj¹cego BookCreate
 builder.Services.AddValidatorsFromAssemblyContaining<BookCreate>();
 
+//Serwis autentykacji, rejestracji, logowania etc.
+builder.Services.AddIdentityServices(builder.Configuration);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -48,6 +63,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
@@ -61,8 +78,9 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<DataContext>();
         // Opcjonalnie: automatyczne wykonanie migracji przy starcie
+        var userManager = services.GetRequiredService<UserManager<AppUser>>();
         await context.Database.MigrateAsync();
-        await Seed.SeedData(context);
+        await Seed.SeedData(context,userManager);
     }
     catch (Exception ex)
     {
@@ -70,5 +88,6 @@ using (var scope = app.Services.CreateScope())
         logger.LogError(ex, "Wyst¹pi³ b³¹d podczas migracji lub seedowania danych.");
     }
 }
+
 
 app.Run();
