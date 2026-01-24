@@ -6,24 +6,62 @@ namespace Library.Infrastructure
 {
     public class Seed
     {
-        public static async Task SeedData(DataContext context, UserManager<AppUser> userManager)
+        public static async Task SeedData(
+            DataContext context,
+            UserManager<AppUser> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
-            if(!userManager.Users.Any())
+            var roleNames = new[] { "User", "Admin" };
+
+            foreach (var roleName in roleNames)
             {
-                var users = new List<AppUser>
+                if (!await roleManager.RoleExistsAsync(roleName))
                 {
-                    new AppUser{DisplayName="franek", UserName="Franco123", Email="franek@test.com",Bio=""},
-                    new AppUser{DisplayName ="asia", UserName="asia123", Email="asia@test.com",Bio=""}
-                };
-
-                foreach(var user in users)
-                {
-                    await userManager.CreateAsync(user, "Hase!l0123");
+                    await roleManager.CreateAsync(new IdentityRole(roleName));
                 }
-
             }
 
-            // Sprawdzamy asynchronicznie, czy są już jacyś autorzy
+            var admin = await userManager.FindByNameAsync("admin");
+            if (admin == null)
+            {
+                admin = new AppUser
+                {
+                    DisplayName = "admin",
+                    UserName = "admin",
+                    Email = "admin@admin.com",
+                    Bio = ""
+                };
+
+                await userManager.CreateAsync(admin, "Zaq12wsx!");
+                await userManager.AddToRoleAsync(admin, "Admin");
+            }
+
+            var user = await userManager.FindByNameAsync("user123");
+            if (user == null)
+            {
+                user = new AppUser
+                {
+                    DisplayName = "user",
+                    UserName = "user123",
+                    Email = "user@user.com",
+                    Bio = ""
+                };
+
+                await userManager.CreateAsync(user, "Zaq12wsx!");
+                await userManager.AddToRoleAsync(user, "User");
+            }
+
+            var existingUsers = userManager.Users.ToList();
+
+            foreach (var u in existingUsers)
+            {
+                var roles = await userManager.GetRolesAsync(u);
+                if (!roles.Any())
+                {
+                    await userManager.AddToRoleAsync(u, "User");
+                }
+            }
+
             if (await context.Authors.AnyAsync()) return;
 
             var authors = new List<Author>
@@ -47,38 +85,6 @@ namespace Library.Infrastructure
                             ISBN = "9780451524935",
                             IsAvailable = true,
                             Publisher = "Secker & Warburg"
-                        },
-                        new Book
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = "Animal Farm",
-                            Genre = BookGenre.Fiction,
-                            PublishedDate = new DateTime(1945, 8, 17),
-                            ISBN = "9780451526342",
-                            IsAvailable = true,
-                            Publisher = "Secker & Warburg"
-                        }
-                    }
-                },
-                new Author
-                {
-                    Id = Guid.NewGuid(),
-                    FirstName = "Henryk",
-                    LastName = "Sienkiewicz",
-                    Biography = "Polish journalist and novelist, Nobel Prize in Literature 1905.",
-                    Nationality = "Polish",
-                    DateOfBirth = new DateTime(1846, 5, 5),
-                    Books = new List<Book>
-                    {
-                        new Book
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = "Quo Vadis",
-                            Genre = BookGenre.History,
-                            PublishedDate = new DateTime(1896, 1, 1),
-                            ISBN = "9780781284501",
-                            IsAvailable = true,
-                            Publisher = "Gebethner i Wolff"
                         }
                     }
                 }
@@ -89,3 +95,4 @@ namespace Library.Infrastructure
         }
     }
 }
+

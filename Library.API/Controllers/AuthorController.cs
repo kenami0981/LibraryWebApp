@@ -3,6 +3,7 @@ using Library.Domain;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Library.Application.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace Library.API.Controllers
@@ -43,6 +44,7 @@ namespace Library.API.Controllers
             return BadRequest(result.ErrorMessage);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")] //api/authors/id z ciałem JSON obiektu Author
         public async Task<IActionResult> EditAuthor(Guid id, AuthorCreateDto author)
         {
@@ -62,6 +64,7 @@ namespace Library.API.Controllers
             return BadRequest(result.ErrorMessage);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost] //api/authors
         public async Task<ActionResult> CreateAuthor(AuthorCreateDto author)
         {
@@ -79,6 +82,7 @@ namespace Library.API.Controllers
             return BadRequest(result.ErrorMessage);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")] //api/authors/id
         public async Task<IActionResult> DeleteAuthor(Guid id)
         {

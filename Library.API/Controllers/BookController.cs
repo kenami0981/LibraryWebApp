@@ -3,6 +3,7 @@ using Library.Domain;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Library.Application.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Library.API.Controllers
 {
@@ -13,7 +14,7 @@ namespace Library.API.Controllers
         {
             _mediator = mediator;
         }
-
+  
         [HttpGet] //api/books
         public async Task<ActionResult<List<BookDto>>> GetBooks()
         {
@@ -43,7 +44,7 @@ namespace Library.API.Controllers
             return BadRequest(result.ErrorMessage);
      
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")] //api/books/id z ciałem JSON obiektu Book
         public async Task<IActionResult> EditBook(Guid id, BookCreateDto book)
         {
@@ -64,7 +65,7 @@ namespace Library.API.Controllers
 
             return BadRequest(result.ErrorMessage);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost] //api/books
         public async Task<ActionResult> CreateBook(BookCreateDto book)
         {
@@ -80,6 +81,7 @@ namespace Library.API.Controllers
             return BadRequest(result.ErrorMessage);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")] //api/books/{id}
         public async Task<ActionResult> DeleteBook(Guid id)
         {

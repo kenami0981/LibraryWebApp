@@ -1,29 +1,31 @@
-﻿using Library.Infrastructure;
+﻿using Library.API;
 using Library.Domain;
+using Library.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
-
-
-namespace Library.API
+public static class IdentityService
 {
-    public static class IdentityService
+    public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
     {
-        public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
-        {
-            services.AddIdentityCore<AppUser>(opt =>
+        services
+            .AddIdentityCore<AppUser>(opt =>
             {
                 opt.Password.RequireNonAlphanumeric = false;
                 opt.Password.RequireDigit = false;
                 opt.Password.RequiredLength = 6;
             })
-            .AddEntityFrameworkStores<DataContext>();
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<DataContext>()
+            .AddSignInManager<SignInManager<AppUser>>();
 
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(config["TokenKey"]));
+        var key = new SymmetricSecurityKey(
+            System.Text.Encoding.UTF8.GetBytes(config["TokenKey"])
+        );
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(opt =>
             {
                 opt.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -34,9 +36,8 @@ namespace Library.API
                 };
             });
 
-            services.AddScoped<TokenService>();
+        services.AddScoped<TokenService>();
 
-            return services;
-        }
+        return services;
     }
 }
